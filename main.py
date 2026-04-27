@@ -1,5 +1,6 @@
 from AlgorithmImports import *
-from models import EQUITY_UNIVERSE, CompositeTrendAlphaModel, TargetVolPortfolioConstructionModel, SignalStrengthExecutionModel, PortfolioLogger
+from models import EQUITY_UNIVERSE, TargetVolPortfolioConstructionModel, SignalStrengthExecutionModel, PortfolioLogger
+from signals.alpha import CompositeTrendAlphaModel
 from config import (
     TEAM_ID,
     ALPHA_SIGNAL_WEIGHTS,

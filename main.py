@@ -87,13 +87,14 @@ class WolfpackTrendAlgorithm(QCAlgorithm):
             signal_temperature=ALPHA_SIGNAL_TEMPERATURE,
             signal_weights=ALPHA_SIGNAL_WEIGHTS,
             min_magnitude=ALPHA_MIN_MAGNITUDE,
+            max_positions=10,
             logger=self.logger,
             algorithm=self
         ))
         self.Debug(
             "Alpha: Composite Trend "
             f"(SMA 20/63/252, ATR 14, weekly rebalance, daily emission, "
-            f"weights={ALPHA_SIGNAL_WEIGHTS}, temp={ALPHA_SIGNAL_TEMPERATURE})"
+            f"weights={ALPHA_SIGNAL_WEIGHTS}, temp={ALPHA_SIGNAL_TEMPERATURE}, max_positions=10)"
         )
 
         self.execution_model = SignalStrengthExecutionModel(

@@ -28,7 +28,8 @@ class CompositeTrendAlphaModel(AlphaModel):
                  signal_temperature=ALPHA_SIGNAL_TEMPERATURE,
                  logger=None, algorithm=None,
                  signal_weights=ALPHA_SIGNAL_WEIGHTS,
-                 min_magnitude=ALPHA_MIN_MAGNITUDE):
+                 min_magnitude=ALPHA_MIN_MAGNITUDE,
+                 max_positions=10):
         self.short_period = short_period
         self.medium_period = medium_period
         self.long_period = long_period
@@ -45,6 +46,7 @@ class CompositeTrendAlphaModel(AlphaModel):
 
         # Minimum magnitude threshold to emit insight
         self.min_magnitude = max(0.0, float(min_magnitude))
+        self.max_positions = max(0, int(max_positions))
 
         # Indicators keyed by symbol
         self.sma_short = {}
@@ -135,6 +137,7 @@ class CompositeTrendAlphaModel(AlphaModel):
 
     def _compute_signals(self, algorithm, data):
         """Compute fresh signals and store in cached_signals. Log to logger."""
+        candidate_signals = []
         for symbol in self.sma_short.keys():
             if not self.sma_short[symbol].IsReady:
                 continue
@@ -165,8 +168,23 @@ class CompositeTrendAlphaModel(AlphaModel):
                 continue
 
             direction = InsightDirection.Up if mag > 0 else InsightDirection.Down
-            self.cached_signals[symbol] = (direction, mag)
+            candidate_signals.append((
+                abs(mag),
+                symbol,
+                direction,
+                mag,
+                price,
+                sma_s,
+                sma_m,
+                sma_l,
+                atr_value
+            ))
 
+        candidate_signals.sort(key=lambda item: item[0], reverse=True)
+        top_signals = candidate_signals[:self.max_positions]
+
+        for _, symbol, direction, mag, price, sma_s, sma_m, sma_l, atr_value in top_signals:
+            self.cached_signals[symbol] = (direction, mag)
             if self.logger is not None:
                 direction_str = "Up" if direction == InsightDirection.Up else "Down"
                 self.logger.log_signal(
